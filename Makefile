@@ -1,69 +1,46 @@
-# Standard
-NAME				= push_swap
+NAME = push_swap
 
-# Directories
-LIBFT				= ./libft/libft.a
-FT_PRINTF			= ./ft_printf/ft_printf.a
-INC					= inc/
-SRC_DIR				= srcs/
-OBJ_DIR				= obj/
+CC = cc
+CFLAGS = -Wall -Wextra -Werror
 
-# Compiler and CFlags
-CC					= gcc
-CFLAGS				= -Wall -Werror -Wextra -I
-RM					= rm -f
+SOURCE = commands/rev_rotate.c commands/rotate.c \
+        commands/sort_stacks.c commands/ft_sort_three.c commands/swap.c \
+        sources/ft_handle_errors.c sources/ft_init_a_to_b.c sources/ft_init_b_to_a.c \
+        sources/push_swap.c commands/push.c sources/ft_init_stack.c \
+        sources/ft_stack_utils.c
 
-# Source Files
-COMMANDS_DIR		=	$(SRC_DIR)commands/push.c \
-						$(SRC_DIR)commands/rev_rotate.c \
-						$(SRC_DIR)commands/rotate.c \
-						$(SRC_DIR)commands/sort_stacks.c \
-						$(SRC_DIR)commands/sort_three.c \
-						$(SRC_DIR)commands/swap.c
+OBJ = $(SOURCE:.c=.o)
 
-PUSH_SWAP_DIR		=	$(SRC_DIR)push_swap/ft_handle_errors.c \
-						$(SRC_DIR)push_swap/ft_init_a_to_b.c \
-						$(SRC_DIR)push_swap/ft_init_b_to_a.c \
-						$(SRC_DIR)push_swap/push_swap.c \
-						$(SRC_DIR)push_swap/ft_init_stack.c \
-						$(SRC_DIR)push_swap/ft_stack_utils.c
+LIBFT_DIR = libft
+LIBFT_LIB = $(LIBFT_DIR)/libft.a
+FT_PRINTF_DIR = ft_printf
+FT_PRINTF_LIB = $(FT_PRINTF_DIR)/libftprintf.a
 
-# Concatenate all source files
-SRCS 				= $(COMMANDS_DIR) $(PUSH_SWAP_DIR)
+all: $(LIBFT_LIB) $(FT_PRINTF_LIB) $(NAME)
 
-# Apply the pattern substitution to each source file in SRC and produce a corresponding list of object files in the OBJ_DIR
-OBJ 				= $(patsubst $(SRC_DIR)%.c,$(OBJ_DIR)%.o,$(SRCS))
+$(NAME): $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(LIBFT_LIB) $(FT_PRINTF_LIB)
 
-# Build rules
-start:				
-					@make all
+$(LIBFT_LIB):
+	$(MAKE) -C $(LIBFT_DIR)
 
-$(LIBFT):
-					@make -C ./libft
+$(FT_PRINTF_LIB):
+	$(MAKE) -C $(FT_PRINTF_DIR)
 
-$(FT_PRINTF):
-					@make -C ./ft_printf
-
-all: 				$(NAME)
-
-$(NAME): 			$(OBJ) $(LIBFT)
-					@$(CC) $(CFLAGS) $(INC) $(OBJ) $(LIBFT) -o $(NAME)
-
-# Compile object files from source files
-$(OBJ_DIR)%.o:		$(SRC_DIR)%.c 
-					@mkdir -p $(@D)
-					@$(CC) $(CFLAGS) $(INC) -c $< -o $@
+%.o: %.c push_swap.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-					@$(RM) -r $(OBJ_DIR)
-					@make clean -C ./libft
-					@make clean -C ./ft_printf
+	rm -rf $(OBJ)
+	$(MAKE) -C $(LIBFT_DIR) clean
+	$(MAKE) -C $(FT_PRINTF_DIR) clean
 
-fclean: 			clean
-					@$(RM) $(NAME)
-					@$(RM) $(LIBFT)
+fclean: clean
+	rm -rf $(NAME)
+	$(MAKE) -C $(LIBFT_DIR) fclean
+	$(MAKE) -C $(FT_PRINTF_DIR) fclean
 
-re: 				fclean all
+re: fclean all
 
-# Phony targets represent actions not files
-.PHONY: 			start all clean fclean re
+.PHONY: all clean fclean re
+
